@@ -1,21 +1,29 @@
 package app.udala.forum.config.security;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import app.udala.forum.modelo.Usuario;
+import app.udala.forum.repository.UsuarioRepository;
 
 public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
 	
 	private TokenService tokenService;
+	private UsuarioRepository repository;
 	
-	public AutenticacaoViaTokenFilter(TokenService tokenService) {
+	public AutenticacaoViaTokenFilter(TokenService tokenService, UsuarioRepository repository) {
 		super();
 		this.tokenService = tokenService;
+		this.repository = repository;
 	}
 
 	@Override
@@ -23,11 +31,24 @@ public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 
 		String token = recuperarToken(request);
-
 		boolean valido = tokenService.isTokenValido(token);
-		System.out.println(valido);
+		if (valido) {
+			autenticarUsuario(token);
+		}
 		
 		filterChain.doFilter(request, response);
+	}
+
+	private void autenticarUsuario(String token) {
+		Long idUsuario = tokenService.getIdUsuario(token);
+		Optional<Usuario> usuario = repository.findById(idUsuario);
+		
+		if (usuario.isPresent()) {
+			UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario.get(), null, usuario.get().getAuthorities()); 
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+		}
+		
+		
 	}
 
 	private String recuperarToken(HttpServletRequest request) {

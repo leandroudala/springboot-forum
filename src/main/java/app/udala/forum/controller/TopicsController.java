@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,6 +58,7 @@ public class TopicsController {
 
 	@PostMapping
 	@Transactional
+	@CacheEvict(value = "getTopics", allEntries = true)
 	public ResponseEntity<TopicoDto> cadastrar(@Valid @RequestBody TopicoForm form, UriComponentsBuilder uriBuilder) {
 		Topico topico = form.converter(cursoRepository);
 		topicoRepository.save(topico);
@@ -66,6 +68,7 @@ public class TopicsController {
 	}
 
 	@GetMapping("/{id}")
+	@CacheEvict(value = "getTopics", allEntries = true)
 	public ResponseEntity<TopicoDetalhesDto> get(@PathVariable Long id) {
 		Optional<Topico> topico = topicoRepository.findById(id);
 		if (topico.isPresent()) {
@@ -76,6 +79,7 @@ public class TopicsController {
 
 	@PutMapping("/{id}")
 	@Transactional
+	@CacheEvict(value = "getTopics", allEntries = true)
 	public ResponseEntity<TopicoDto> atualizar(@PathVariable Long id, @RequestBody @Valid TopicoFormUpdate form) {
 		Optional<Topico> topico = topicoRepository.findById(id);
 		if (topico.isPresent()) {
@@ -88,6 +92,7 @@ public class TopicsController {
 
 	@DeleteMapping("/{id}")
 	@Transactional
+	@CacheEvict(value = "getTopics", allEntries = true)
 	public ResponseEntity<?> remover(@PathVariable Long id) {
 		Optional<Topico> topico = topicoRepository.findById(id);
 		if (topico.isPresent()) {

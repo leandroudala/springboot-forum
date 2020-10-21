@@ -9,6 +9,8 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +41,8 @@ public class TopicsController {
 	private CursoRepository cursoRepository;
 
 	@GetMapping
-	public Page<TopicoDto> lista(@RequestParam(required = false) String nomeCurso, Pageable paginacao) {
+	public Page<TopicoDto> lista(@RequestParam(required = false) String nomeCurso,
+			@PageableDefault(sort = "id", direction = Direction.DESC, page = 0, size = 10) Pageable paginacao) {
 		Page<Topico> topicos;
 
 		if (nomeCurso != null) {

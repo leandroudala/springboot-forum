@@ -21,15 +21,15 @@ public class Perfil implements GrantedAuthority {
 		return id;
 	}
 
-	public final void setId(Long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public final String getNome() {
+	public String getNome() {
 		return nome;
 	}
 
-	public final void setNome(String nome) {
+	public void setNome(String nome) {
 		this.nome = nome;
 	}
 
